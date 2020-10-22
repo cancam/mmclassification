@@ -1,5 +1,4 @@
 import os
-import pdb
 import numpy as np
 
 from .base_dataset import BaseDataset
@@ -178,9 +177,6 @@ class ImageNet(BaseDataset):
         self.samples = samples
 
         data_infos = []
-        idx = 0
-        print(len(self.samples))
-        pdb.set_trace()
         for filename, gt_label in self.samples:
             info = {'img_prefix': self.data_prefix}
             info['img_info'] = {'filename': filename}
