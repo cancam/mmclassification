@@ -61,18 +61,16 @@ def main(PATH, set_name, extract, analysis):
     
     if extract:
         coco_ds = CocoDataset(PATH, set_name)
-        dataset_info = coco_ds.process_images()
-        save_info(dataset_info, PATH, set_name)
+        dataset_info = coco_ds.process_images(set_name, save=True)
 
-    pdb.set_trace()
     if analysis:
         dataset_info = load_info(PATH, set_name)
         do_analysis(dataset_info, PATH, set_name)
-    
+        save_info(dataset_info, PATH, set_name) 
 
 if __name__ == '__main__':
-    PATH = '/home/cancam/imgworkspace/sIoU/gradcam_plus_plus-pytorch/data/coco'
-    set_name = 'train2017'
+    PATH = '../data/coco'
+    set_name = 'val2017'
     extract = True
-    analysis = True
+    analysis = False
     main(PATH, set_name, extract, analysis)

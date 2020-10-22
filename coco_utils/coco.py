@@ -31,8 +31,7 @@ class CocoDataset():
         self.size = 224, 224
         self.set_name = set_name
         self.processed_path = os.path.join(PATH, 'fine_tune', self.set_name[:-4])
-        self.create_folders(self.processed_path)
-        
+        self.dataset_dir = os.path.join(PATH, 'fine_tune') 
         # get ann file.
         ann_filename = 'annotations/instances_' + set_name + '.json'
         ann_file = os.path.join(PATH, ann_filename)
@@ -66,12 +65,33 @@ class CocoDataset():
     def read_image(self, path):
         return Image.open(path)
 
-    def process_images(self, save=True):
+    def process_val_imgs(self):
+        raise NotImplementedError
+        '''
+        # filter images
+        valid_inds = self._filter_imgs()
+        self.img_infos = [self.img_infos[i] for i in valid_inds]
+        for idx in range(0, len(self.img_infos)):
+            ann_info = self.get_ann_info(idx)
+            file_name = self.img_infos[idx]['file_name']
+            name_extension = 'COCO_val/{}'.format(file_name)
+            pdb.set_trace()
+        '''
+
+    def process_images(self, set_name, save=True, debug_labels=False):
+        if set_name == 'val2017':
+            meta_path = os.path.join(self.dataset_dir, 'meta', 'val.txt')
+            try:
+                os.remove(meta_path)
+            except OSError:
+                pass
         # filter images
         valid_inds = self._filter_imgs()
         self.img_infos = [self.img_infos[i] for i in valid_inds]
         imgs_w_parts = []
         # load images and metas.
+        if debug_labels:
+            labels_list = np.asarray([])
         for idx in range(0, len(self.img_infos)):
             # read img info, annotations.
             img_info = self.img_infos[idx]
@@ -79,6 +99,8 @@ class CocoDataset():
             # get bboxes and labels
             bboxes = ann_info['bboxes']
             labels = ann_info['labels']
+            if debug_labels:
+                labels_list = np.concatenate((labels_list, labels))
             # read image
             #pdb.set_trace()
             img = self.read_image(os.path.join(self.path, self.set_name, img_info['filename']))
@@ -90,20 +112,34 @@ class CocoDataset():
             if idx % 100 == 0:
                 print("Image count:[{}]/[{}], Total Parts:{}\n".\
                        format(idx, len(self.img_infos),len(part_tuples)))
- 
             
             # collect tuples to save parts w/labels.
             if save:
-                for tup_idx, part_tuple in enumerate(part_tuples):
-                    save_path = os.path.join(self.processed_path, self.CLASSES[part_tuple[1]-1])
-                    im_name = str(img_info['id']) + '_' + str(tup_idx) + '.jpg'
-                    save_name = os.path.join(save_path, im_name)
-                    # ignore 1d images after crop
-                    if 0 in part_tuple[0].size:
-                        continue
-                    else:
-                        part_tuple[0].save(save_name)
-            
+                if set_name == 'train2017':
+                    self.create_folders(self.processed_path)
+                    for tup_idx, part_tuple in enumerate(part_tuples):
+                        save_path = os.path.join(self.processed_path, self.CLASSES[part_tuple[1]-1])
+                        im_name = str(img_info['id']) + '_' + str(tup_idx) + '.jpg'
+                        save_name = os.path.join(save_path, im_name)
+                        # ignore 1d images after crop
+                        if 0 in part_tuple[0].size:
+                            continue
+                        else:
+                            part_tuple[0].save(save_name)
+                if set_name == 'val2017':
+                    for tup_idx, part_tuple in enumerate(part_tuples):
+                        save_path = os.path.join(self.dataset_dir, 'val')
+                        im_name = str(img_info['id']) + '_' + str(tup_idx) + '.jpg'
+                        save_name = os.path.join(save_path, im_name) 
+                        # ignore 1d images after crop
+                        if 0 in part_tuple[0].size:
+                            continue
+                        else:
+                            part_tuple[0].save(save_name)
+                        annot_line = im_name + ' ' + str(part_tuple[1]-1) +'\n'
+                        with open(meta_path, "a") as meta_file:
+                                meta_file.write(annot_line)
+
         return self.part_info
 
             
