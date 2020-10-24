@@ -12,7 +12,7 @@ from mmcls.apis import multi_gpu_test, single_gpu_test
 from mmcls.core import wrap_fp16_model
 from mmcls.datasets import build_dataloader, build_dataset
 from mmcls.models import build_classifier
-
+import pdb
 
 def parse_args():
     parser = argparse.ArgumentParser(description='mmcls test model')
@@ -66,6 +66,7 @@ def main():
         round_up=False)
 
     # build the model and load checkpoint
+    pdb.set_trace()
     model = build_classifier(cfg.model)
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
@@ -85,6 +86,7 @@ def main():
 
     rank, _ = get_dist_info()
     if rank == 0:
+        pdb.set_trace()
         if args.metric != '':
             results = dataset.evaluate(outputs, args.metric)
             for topk, acc in results.items():
@@ -93,6 +95,7 @@ def main():
             scores = np.vstack(outputs)
             pred_score = np.max(scores, axis=1)
             pred_label = np.argmax(scores, axis=1)
+            pdb.set_trace()
             if 'CLASSES' in checkpoint['meta']:
                 CLASSES = checkpoint['meta']['CLASSES']
             else:

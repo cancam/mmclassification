@@ -34,7 +34,7 @@ data = dict(
     test=dict(
         # replace `data/val` with `data/test` for standard test
         type=dataset_type,
-        data_prefix='data/coco/fine_tune//val',
+        data_prefix='data/coco/fine_tune/val',
         ann_file='data/coco/fine_tune/meta/val.txt',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='accuracy')
