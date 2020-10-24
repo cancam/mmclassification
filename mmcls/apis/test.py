@@ -8,13 +8,18 @@ import mmcv
 import torch
 import torch.distributed as dist
 from mmcv.runner import get_dist_info
-
+import pdb
 
 def single_gpu_test(model, data_loader, show=False, out_dir=None):
     model.eval()
     results = []
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
+    for m in model.modules():
+        for c in m.children():
+            target_layer = c.backbone.layer4
+            pdb.set_trace()
+    pdb.set_trace()
     for i, data in enumerate(data_loader):
         with torch.no_grad():
             result = model(return_loss=False, **data)

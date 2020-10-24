@@ -66,13 +66,12 @@ def main():
         round_up=False)
 
     # build the model and load checkpoint
-    pdb.set_trace()
     model = build_classifier(cfg.model)
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
         wrap_fp16_model(model)
+    pdb.set_trace()
     checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
-
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
         outputs = single_gpu_test(model, data_loader)
@@ -86,7 +85,6 @@ def main():
 
     rank, _ = get_dist_info()
     if rank == 0:
-        pdb.set_trace()
         if args.metric != '':
             results = dataset.evaluate(outputs, args.metric)
             for topk, acc in results.items():

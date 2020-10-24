@@ -1,5 +1,6 @@
 import torch.nn as nn
 from mmcv.utils import Registry, build_from_cfg
+import pdb
 
 BACKBONES = Registry('backbone')
 CLASSIFIERS = Registry('classifier')
@@ -9,6 +10,7 @@ LOSSES = Registry('loss')
 
 
 def build(cfg, registry, default_args=None):
+    pdb.set_trace()
     if isinstance(cfg, list):
         modules = [
             build_from_cfg(cfg_, registry, default_args) for cfg_ in cfg
