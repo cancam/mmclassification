@@ -14,6 +14,7 @@ from mmcls.apis import set_random_seed, train_model
 from mmcls.datasets import build_dataset
 from mmcls.models import build_classifier
 from mmcls.utils import collect_env, get_root_logger
+import pdb
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a model')
@@ -127,7 +128,6 @@ def main():
     cfg.seed = args.seed
     meta['seed'] = args.seed
     model = build_classifier(cfg.model)
-
     datasets = [build_dataset(cfg.data.train)]
     if len(cfg.workflow) == 2:
         val_dataset = copy.deepcopy(cfg.data.val)
